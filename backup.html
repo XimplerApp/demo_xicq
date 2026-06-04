@@ -1,1 +1,785 @@
 df
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ximpler Xfas — Demo</title>
+<style>
+:root{
+  --navy:#06192f;--red:#e3262f;--blue:#1f8fe5;
+  --border:#dde3ea;--muted:#6b7280;--soft:#f8fafc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;
+  background:#06192f;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;
+}
+
+/* ── wrapper takes full viewport, capped nicely ── */
+#wrap{
+  width:100vw;
+  height:100vh;
+  max-width:480px;
+  max-height:780px;
+  background:var(--navy);
+  position:relative;
+  overflow:hidden;
+}
+
+/* ── scenes ── */
+.scene{
+  position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  display:flex;flex-direction:column;
+}
+.scene.active{opacity:1;z-index:2}
+
+/* ── app top bar ── */
+.tb{
+  height:44px;background:var(--navy);
+  display:flex;align-items:center;padding:0 12px;gap:9px;flex:0 0 44px;
+}
+.logo{color:var(--red);font-weight:900;font-size:14px;letter-spacing:-.5px}
+.tbr{margin-left:auto;display:flex;gap:7px;align-items:center}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#fff;flex:0 0 auto;font-size:10px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.on{background:#16a34a}.dot.off{background:#94a3b8}
+
+/* ── body area (between topbar and bottom nav) ── */
+.body{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  background:#fff;display:flex;flex-direction:column;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* ── bottom nav ── */
+.bnav{
+  height:52px;background:#fff;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-around;
+  flex:0 0 52px;
+}
+.bni{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:9px;color:var(--muted);flex:1;cursor:pointer;position:relative;padding:5px 0;
+}
+.bni.active{color:var(--navy);font-weight:800}
+.bni.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:24px;height:3px;background:var(--red);border-radius:999px}
+.bni>span:first-child{font-size:18px}
+.nbadge{position:absolute;top:3px;right:calc(50% - 17px);background:var(--red);color:#fff;
+  font-size:8px;border-radius:999px;min-width:14px;height:14px;padding:0 3px;
+  display:flex;align-items:center;justify-content:center;font-weight:800}
+
+/* ── per-conversation header ── */
+.ch{
+  height:48px;background:var(--navy);color:#fff;
+  display:flex;align-items:center;padding:0 12px;gap:9px;flex:0 0 48px;
+}
+.ch .back{font-size:20px;cursor:pointer;line-height:1;opacity:.85}
+.ch .chtitle{font-size:13px;font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── messages ── */
+.msgs{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.mr{display:flex;gap:6px;align-items:flex-end}
+.mr.me{justify-content:flex-end}
+.bb{max-width:82%;background:#f1f5f9;border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.4}
+.bb.me{background:#dbeafe}
+.sndr{font-weight:800;font-size:9px;color:#334155;margin-bottom:2px}
+.meta{font-size:8px;color:#94a3b8;margin-top:3px;text-align:right}
+.folio{background:#e0f2fe;color:#0369a1;font-weight:800;font-size:9px;
+  padding:2px 6px;border-radius:999px;border:0;cursor:pointer;display:inline}
+
+/* ── composer ── */
+.cb{
+  border-top:1px solid var(--border);
+  display:flex;align-items:flex-end;padding:7px 10px;gap:7px;
+  background:#fff;flex:0 0 auto;
+}
+.ci{
+  flex:1;min-height:34px;border:1px solid var(--border);
+  border-radius:18px;padding:7px 12px;font-size:12px;
+  outline:none;color:#334155;background:#f8fafc;
+  resize:none;font-family:inherit;line-height:1.35;
+}
+.sbtn{width:34px;height:34px;border-radius:50%;border:0;background:var(--blue);
+  color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 34px}
+.abtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);
+  background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 34px}
+
+/* ── list items ── */
+.li{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid #f0f4f8;cursor:pointer}
+.lii{flex:1;min-width:0}
+.ln{font-size:12px;font-weight:800;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.lp{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.lt{font-size:10px;color:var(--muted);white-space:nowrap}
+.cbadge{background:var(--red);color:#fff;font-size:8px;border-radius:999px;
+  min-width:16px;height:16px;padding:0 3px;display:flex;align-items:center;justify-content:center;font-weight:800}
+.pchip{font-size:9px;font-weight:800;padding:2px 5px;border-radius:999px}
+.pchip.on{background:#dcfce7;color:#15803d}
+.pchip.off{background:#f1f5f9;color:#64748b}
+.shead{padding:8px 13px 5px;font-size:10px;font-weight:800;color:#94a3b8;
+  text-transform:uppercase;letter-spacing:.5px;background:#fff;border-bottom:1px solid var(--border)}
+
+/* ── attachments ── */
+.atb{border:1px solid #cbd5e1;border-radius:9px;padding:7px;display:flex;
+  align-items:center;gap:7px;margin-top:5px;background:#fff}
+
+/* ── team avatar group ── */
+.tav-group{display:flex}
+.tav-group .av{margin-left:-7px;border:2px solid #fff}
+.tav-group .av:first-child{margin-left:0}
+
+/* ── typing ── */
+.tc-blink{display:inline-block;width:2px;height:12px;background:#334155;
+  animation:blink .7s infinite;vertical-align:middle;margin-left:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── doc rows ── */
+.doc-row{display:flex;align-items:flex-start;gap:9px;padding:10px 13px;border-bottom:1px solid #f0f4f8}
+.doc-icon{width:36px;height:36px;border-radius:9px;background:#e0f2fe;
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 36px}
+.doc-main{min-width:0;flex:1}
+.doc-name{font-size:12px;font-weight:800;color:#0f172a;line-height:1.3}
+.doc-meta{font-size:10px;color:#64748b;margin-top:2px}
+.dpill{display:inline-flex;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:800}
+.dpill.sent{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+.dpill.recv{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1}
+.dpill.img{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd}
+.doc-act{margin-top:5px;display:flex;gap:5px}
+.dmini{border:1px solid var(--border);background:#fff;color:#334155;
+  padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer}
+.ddl{border:1px solid var(--border);background:#fff;color:#1d4ed8;
+  padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer}
+
+/* ── task card ── */
+.tc-tabs{display:flex;border-bottom:1px solid var(--border)}
+.tc-tab{flex:1;text-align:center;padding:7px 0;font-size:11px;color:var(--muted)}
+.tc-tab.active{font-weight:800;color:var(--blue);border-bottom:2px solid var(--blue)}
+.tc-lbl{font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;margin-bottom:2px}
+.tc-sect{font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;margin-bottom:2px}
+.tc-val{font-size:10px;color:#94a3b8}
+
+/* ── read receipts ── */
+.rread{display:flex;align-items:center;gap:9px;padding:9px 13px;border-bottom:1px solid #f0f4f8}
+.rread-name{font-size:12px;font-weight:800}
+.rread-sub{font-size:10px;color:#94a3b8;margin-top:1px}
+
+/* ── forum ── */
+.fp{background:var(--soft);border-radius:10px;padding:9px;margin-bottom:7px;border:1px solid var(--border)}
+.fp-hdr{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.fp-name{font-size:11px;font-weight:800}
+.fp-time{font-size:9px;color:#94a3b8;margin-left:auto}
+.fp-body{font-size:11px;color:#334155;line-height:1.4}
+.fp-reply{font-size:10px;color:var(--blue);font-weight:800;margin-top:4px;cursor:pointer}
+.fp-thread{margin-left:12px;border-left:3px solid var(--blue);padding-left:9px}
+
+/* ── action buttons ── */
+.ami{padding:10px 13px;font-size:12px;color:#334155;cursor:pointer;
+  display:flex;align-items:center;gap:9px;border-bottom:1px solid #f0f4f8}
+.ami.blue{color:#0369a1;font-weight:800}
+
+/* ── overlay label ── */
+.lbl{
+  position:absolute;bottom:58px;left:50%;transform:translateX(-50%);
+  background:rgba(6,25,47,.92);color:#fff;font-size:10px;font-weight:700;
+  padding:5px 14px;border-radius:999px;white-space:nowrap;
+  border:1px solid rgba(255,255,255,.18);z-index:20;
+  max-width:90%;text-align:center;
+}
+
+/* ── progress + counter ── */
+#pgbar{position:absolute;bottom:52px;left:0;height:3px;
+  background:var(--blue);border-radius:0 999px 999px 0;z-index:30;transition:width .1s linear}
+#scnt{position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  font-size:9px;color:rgba(255,255,255,.45);z-index:50;pointer-events:none}
+
+/* ── controls ── */
+#ctrls{
+  margin-top:10px;display:flex;gap:10px;
+}
+.cbtn{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);
+  color:#fff;border-radius:8px;padding:7px 20px;font-size:13px;cursor:pointer}
+.cbtn:hover{background:rgba(255,255,255,.22)}
+
+/* ── cursor ── */
+#cur{position:absolute;pointer-events:none;z-index:40;
+  transition:top .48s cubic-bezier(.4,0,.2,1),left .48s cubic-bezier(.4,0,.2,1),opacity .3s}
+#cur svg{width:20px;height:20px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.55))}
+#cring{position:absolute;width:30px;height:30px;border:2.5px solid rgba(255,255,255,.9);
+  border-radius:50%;pointer-events:none;z-index:39;opacity:0;transform:translate(-50%,-50%) scale(0)}
+#cring.pop{animation:ring .5s ease-out forwards}
+@keyframes ring{0%{opacity:.9;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}}
+
+/* ── intro ── */
+.intro{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:12px;padding:28px 20px;height:100%;background:var(--navy)}
+.i-eyebrow{font-size:10px;font-weight:800;color:rgba(255,255,255,.45);
+  letter-spacing:3px;text-transform:uppercase;animation:fi 1s .2s both}
+.i-title{font-size:26px;font-weight:900;color:#fff;line-height:1.18;animation:fi 1s .5s both}
+.i-title span{color:var(--red)}
+.i-sub{font-size:12px;color:rgba(255,255,255,.55);animation:fi 1s .85s both}
+.i-pills{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;animation:fi 1s 1.1s both}
+.ipill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;padding:5px 12px;font-size:11px;font-weight:800;color:rgba(255,255,255,.8)}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <div id="scnt">1/16</div>
+  <div id="pgbar" style="width:0%"></div>
+  <div id="cur" style="opacity:0;top:50%;left:50%">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M2.5 2.5l6.5 16.5 2.8-6.8 6.8-2.8L2.5 2.5z" fill="#fff" stroke="#111" stroke-width="1.3"/></svg>
+  </div>
+  <div id="cring"></div>
+
+  <!-- S0 INTRO -->
+  <div class="scene active" id="s0">
+    <div class="intro">
+      <div class="i-eyebrow">Este Verano 2026</div>
+      <div class="i-title">Llega el Centro de<br>Comunicación <span>Xfas</span></div>
+      <div class="i-sub">por Ximpler.App — Team Chat v1.6</div>
+      <div class="i-pills">
+        <div class="ipill">💬 Chat</div>
+        <div class="ipill">👥 Teams</div>
+        <div class="ipill">⚙ Forum</div>
+        <div class="ipill">📁 Docs</div>
+        <div class="ipill">🔗 Tarjetas</div>
+        <div class="ipill">✓✓ Lectura</div>
+      </div>
+    </div>
+    <div class="lbl">Ximpler Xfas — Centro de Comunicación</div>
+  </div>
+
+  <!-- S1 Lista chats individuales -->
+  <div class="scene" id="s1">
+    <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Xfas</span><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="body">
+      <div class="shead">Conversaciones individuales</div>
+      <div class="li"><div class="av" style="width:38px;height:38px;background:var(--blue);font-size:12px">MA</div><div class="lii"><div class="ln">Melchor Iván Angulo <span class="pchip on">● En línea</span></div><div class="lp">Revisar avance del tablero…</div><div class="lt">15:25</div></div><div class="cbadge">2</div></div>
+      <div class="li"><div class="av" style="width:38px;height:38px;background:#f59e0b;font-size:12px">VH</div><div class="lii"><div class="ln">Victoria Hernández</div><div class="lp">Ya quedó listo el documento inicial</div><div class="lt">15:30</div></div></div>
+      <div class="li"><div class="av" style="width:38px;height:38px;background:#16a34a;font-size:12px">SC</div><div class="lii"><div class="ln">Saúl Nahúm Cruz <span class="pchip on">● En línea</span></div><div class="lp">Subí el build al servidor staging</div><div class="lt">14:10</div></div><div class="cbadge">1</div></div>
+      <div class="li"><div class="av" style="width:38px;height:38px;background:#7c3aed;font-size:12px">SA</div><div class="lii"><div class="ln">Salvador Ahumada</div><div class="lp">Validé la estructura del módulo</div><div class="lt">13:45</div></div></div>
+      <div class="li"><div class="av" style="width:38px;height:38px;background:#db2777;font-size:12px">AR</div><div class="lii"><div class="ln">Alejandra Ruiz <span class="pchip off">● Ausente</span></div><div class="lp">Confirmado para mañana</div><div class="lt">12:20</div></div></div>
+    </div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span><div class="nbadge">3</div></div>
+      <div class="bni"><span>👥</span><span>Teams</span><div class="nbadge">2</div></div>
+      <div class="bni"><span>⚙</span><span>Forum</span><div class="nbadge">1</div></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">💬 Lista de chats — presencia en tiempo real</div>
+  </div>
+
+  <!-- S2 Chat individual abierto -->
+  <div class="scene" id="s2">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch">
+      <span class="back">←</span>
+      <div class="av" style="width:28px;height:28px;background:var(--blue);font-size:11px">MA</div>
+      <div style="flex:1;min-width:0">
+        <div class="chtitle">Melchor Iván Angulo</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:4px"><span class="dot on" style="width:6px;height:6px"></span>En línea</div>
+      </div>
+      <span style="font-size:17px;color:rgba(255,255,255,.75);cursor:pointer">ℹ</span>
+    </div>
+    <div class="body">
+      <div class="msgs">
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:var(--blue);font-size:9px">MA</div><div class="bb"><div class="sndr">Melchor Iván Angulo</div>Revisar avance del tablero antes de la reunión. Ver <span class="folio">🔗 #206731</span><div class="meta">14:00 ✓✓</div></div></div>
+        <div class="mr me"><div class="bb me">Ok, lo reviso y te comparto comentarios en un momento.<div class="meta">15:25 ✓✓</div></div></div>
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:var(--blue);font-size:9px">MA</div><div class="bb"><div class="sndr">Melchor Iván Angulo</div>¿Puedes revisar también el pendiente <span class="folio">🔗 #206731</span>?<div class="meta">15:28 ✓✓</div></div></div>
+        <div class="mr me"><div class="bb me"><div class="atb"><span style="font-size:16px">📄</span><div><div style="font-size:11px;font-weight:800">propuesta_ajustes.pdf</div><div style="font-size:9px;color:#94a3b8">152 KB</div></div><span style="font-size:10px;color:#1d4ed8;font-weight:800;margin-left:auto">⬇</span></div><div class="meta">15:30 ✓✓</div></div></div>
+      </div>
+    </div>
+    <div class="cb"><div class="abtn">📎</div><textarea class="ci" placeholder="Mensaje a Melchor…" rows="1"></textarea><div class="abtn" style="font-size:11px">⤡</div><div class="sbtn">➤</div></div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">💬 Chat individual — Melchor Iván Angulo</div>
+  </div>
+
+  <!-- S3 Escribiendo -->
+  <div class="scene" id="s3">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch">
+      <span class="back">←</span>
+      <div class="av" style="width:28px;height:28px;background:var(--blue);font-size:11px">MA</div>
+      <div style="flex:1"><div class="chtitle">Melchor Iván Angulo</div><div style="font-size:9px;color:rgba(255,255,255,.6)">escribiendo...</div></div>
+    </div>
+    <div class="body">
+      <div class="msgs">
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:var(--blue);font-size:9px">MA</div><div class="bb"><div class="sndr">Melchor</div>¿Puedes revisar el pendiente <span class="folio">🔗 #206731</span>?<div class="meta">15:28 ✓✓</div></div></div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);background:#fff;padding:8px 10px">
+      <div style="border:1.5px solid var(--blue);border-radius:10px;padding:8px 11px;font-size:12px;color:#334155;background:#fff">
+        Revisé el módulo. Los permisos de lectura están bien, pero el rol "Auditor" necesita acceso de escritura antes del martes<span class="tc-blink"></span>
+      </div>
+      <div style="display:flex;gap:7px;align-items:center;margin-top:7px">
+        <div class="abtn">📎</div>
+        <div class="abtn" style="font-size:11px">⤡</div>
+        <div style="flex:1;font-size:10px;color:#94a3b8">Ctrl+Enter · enviar</div>
+        <div class="sbtn">➤</div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">⌨️ Redactando — modo ampliado ⤡ disponible</div>
+  </div>
+
+  <!-- S4 Enviado -->
+  <div class="scene" id="s4">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch">
+      <span class="back">←</span>
+      <div class="av" style="width:28px;height:28px;background:var(--blue);font-size:11px">MA</div>
+      <div style="flex:1"><div class="chtitle">Melchor Iván Angulo</div><div style="font-size:9px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:3px"><span class="dot on" style="width:6px;height:6px"></span>En línea</div></div>
+    </div>
+    <div class="body">
+      <div class="msgs">
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:var(--blue);font-size:9px">MA</div><div class="bb"><div class="sndr">Melchor</div>¿Puedes revisar el pendiente <span class="folio">🔗 #206731</span>?<div class="meta">15:28 ✓✓</div></div></div>
+        <div class="mr me"><div class="bb me">Revisé el módulo. Los permisos de lectura están bien, pero el rol "Auditor" necesita acceso de escritura antes del martes.<div class="meta">Ahora ✓</div></div></div>
+        <div style="display:flex;justify-content:center;margin:3px 0"><span style="background:#dcfce7;color:#15803d;font-size:10px;padding:2px 12px;border-radius:999px;font-weight:800">✓ Mensaje enviado</span></div>
+      </div>
+    </div>
+    <div class="cb"><div class="abtn">📎</div><textarea class="ci" placeholder="Escribe un mensaje…" rows="1"></textarea><div class="sbtn">➤</div></div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">✅ Enviado — confirmación instantánea</div>
+  </div>
+
+  <!-- S5 Info usuario -->
+  <div class="scene" id="s5">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch"><span class="back">←</span><div class="chtitle">Información del usuario</div></div>
+    <div class="body">
+      <div style="padding:16px 14px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+          <div class="av" style="width:50px;height:50px;background:var(--blue);font-size:16px">MA</div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#111">Melchor Iván Angulo</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px">Director General</div>
+            <div class="pchip on" style="margin-top:4px">● En línea ahora</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:7px 9px;font-size:12px;margin-bottom:14px">
+          <span style="color:#94a3b8;font-weight:800">Área</span><span>Dirección General</span>
+          <span style="color:#94a3b8;font-weight:800">Jefe</span><span>Consejo Directivo</span>
+          <span style="color:#94a3b8;font-weight:800">Correo</span><span style="color:#1d4ed8;word-break:break-all">melchor.angulo@ximpler.app</span>
+          <span style="color:#94a3b8;font-weight:800">Teléfono</span><span>+52 667 100 0001</span>
+          <span style="color:#94a3b8;font-weight:800">Último acceso</span><span>Hoy 15:28</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button style="flex:1;border:1px solid var(--border);background:#fff;padding:9px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer">💬 Enviar mensaje</button>
+          <button style="flex:1;border:1px solid var(--border);background:#fff;padding:9px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer">📋 Ver perfil</button>
+        </div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">ℹ️ Perfil — área, jefe, correo, último acceso</div>
+  </div>
+
+  <!-- S6 Lista Teams -->
+  <div class="scene" id="s6">
+    <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Xfas</span><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="body">
+      <div class="shead">Canales de equipo</div>
+      <div class="li">
+        <div class="tav-group"><div class="av" style="width:26px;height:26px;background:var(--blue);font-size:9px;z-index:3">MA</div><div class="av" style="width:26px;height:26px;background:#f59e0b;font-size:9px;z-index:2">VH</div><div class="av" style="width:26px;height:26px;background:#16a34a;font-size:9px;z-index:1">SC</div><div class="av" style="width:26px;height:26px;background:#fff;color:#334155;font-size:8px;border:2px solid #e5e7eb">+2</div></div>
+        <div class="lii"><div class="ln">Administración</div><div class="lp">Cerrar pendientes administrativos esta semana</div><div class="lt">11:10</div></div>
+      </div>
+      <div class="li">
+        <div class="tav-group"><div class="av" style="width:26px;height:26px;background:#16a34a;font-size:9px;z-index:2">SC</div><div class="av" style="width:26px;height:26px;background:#7c3aed;font-size:9px;z-index:1">SA</div></div>
+        <div class="lii"><div class="ln">Sistemas — Proyecto ABC</div><div class="lp">Subí el avance del módulo de permisos</div><div class="lt">12:30</div></div>
+        <div class="cbadge">1</div>
+      </div>
+      <div class="li">
+        <div class="tav-group"><div class="av" style="width:26px;height:26px;background:var(--blue);font-size:9px;z-index:4">MA</div><div class="av" style="width:26px;height:26px;background:#16a34a;font-size:9px;z-index:3">SC</div><div class="av" style="width:26px;height:26px;background:#7c3aed;font-size:9px;z-index:2">SA</div><div class="av" style="width:26px;height:26px;background:#db2777;font-size:9px;z-index:1">AR</div></div>
+        <div class="lii"><div class="ln">Comité Ejecutivo</div><div class="lp">Agenda para la junta del viernes</div><div class="lt">09:45</div></div>
+        <div class="cbadge">1</div>
+      </div>
+      <div class="li">
+        <div class="tav-group"><div class="av" style="width:26px;height:26px;background:#0f766e;font-size:9px;z-index:2">LD</div><div class="av" style="width:26px;height:26px;background:#16a34a;font-size:9px;z-index:1">JL</div></div>
+        <div class="lii"><div class="ln">Consultoría</div><div class="lp">Nueva propuesta para cliente EDGE</div><div class="lt">Ayer</div></div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bni"><span>💬</span><span>Chat</span></div>
+      <div class="bni active"><span>👥</span><span>Teams</span><div class="nbadge">2</div></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">👥 Lista de Teams — canales grupales</div>
+  </div>
+
+  <!-- S7 Chat equipo abierto -->
+  <div class="scene" id="s7">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch">
+      <span class="back">←</span>
+      <div class="tav-group" style="margin-right:7px">
+        <div class="av" style="width:22px;height:22px;background:var(--blue);font-size:8px;z-index:3">MA</div>
+        <div class="av" style="width:22px;height:22px;background:#f59e0b;font-size:8px;z-index:2">VH</div>
+        <div class="av" style="width:22px;height:22px;background:#16a34a;font-size:8px;z-index:1">SC</div>
+      </div>
+      <div style="flex:1">
+        <div class="chtitle">Administración</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.6)">5 miembros · 3 en línea</div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="msgs">
+        <div style="text-align:center;margin-bottom:4px"><span style="font-size:9px;color:#94a3b8">01 May 2026</span></div>
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:var(--blue);font-size:9px">MA</div><div class="bb"><div class="sndr">Melchor Iván Angulo</div>Cerrar pendientes administrativos esta semana. Actualicen estados en Ximpler.<div class="meta">11:10 ✓✓</div></div></div>
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:#f59e0b;font-size:9px">VH</div><div class="bb"><div class="sndr">Victoria Hernández</div>Entendido, yo actualizo los míos hoy mismo ✓<div class="meta">11:22 ✓✓</div></div></div>
+        <div class="mr me"><div class="bb me">Yo me encargo del reporte semanal de cierre.<div class="meta">11:35 ✓✓</div></div></div>
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:#16a34a;font-size:9px">SC</div><div class="bb"><div class="sndr">Saúl Nahúm Cruz</div>¿Alguien tiene el folio del contrato? Necesito <span class="folio">🔗 #208812</span><div class="meta">11:50 ✓</div></div></div>
+      </div>
+    </div>
+    <div class="cb"><div class="abtn">📎</div><textarea class="ci" placeholder="Mensaje al equipo…" rows="1"></textarea><div class="sbtn">➤</div></div>
+    <div class="bnav">
+      <div class="bni"><span>💬</span><span>Chat</span></div>
+      <div class="bni active"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">👥 Chat de equipo — Administración (5 miembros)</div>
+  </div>
+
+  <!-- S8 Imagen para compartir -->
+  <div class="scene" id="s8">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch"><span class="back">←</span><div class="av" style="width:28px;height:28px;background:var(--blue);font-size:11px">MA</div><div class="chtitle" style="flex:1">Melchor</div></div>
+    <div class="body">
+      <div class="msgs">
+        <div class="mr me">
+          <div class="bb me">
+            Aquí te mando el reporte y la captura:
+            <div class="atb"><span style="font-size:16px">📄</span><div><div style="font-size:11px;font-weight:800">Reporte_Q1_2026.pdf</div><div style="font-size:9px;color:#94a3b8">1.2 MB</div></div><span style="font-size:10px;color:#1d4ed8;font-weight:800;margin-left:auto">⬇</span></div>
+            <div style="margin-top:6px;width:170px;height:95px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-radius:9px;border:1px solid #93c5fd;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px"><span style="font-size:22px">🖼</span><span style="font-size:10px;color:#1e40af;font-weight:800">captura_dashboard.png</span><span style="font-size:9px;color:#3b82f6">340 KB</span></div>
+            <div class="meta">Ahora ✓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:7px 10px;background:#fff">
+      <div style="background:#e0f2fe;border-radius:7px;padding:5px 9px;font-size:10px;color:#0369a1;font-weight:800;margin-bottom:6px">🖼 captura_dashboard.png lista — 340 KB</div>
+      <div style="display:flex;gap:7px;align-items:center"><div class="abtn">📎</div><textarea class="ci" placeholder="Añade un mensaje…" rows="1"></textarea><div class="sbtn">➤</div></div>
+    </div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">🖼 Vista previa de imagen antes de enviar</div>
+  </div>
+
+  <!-- S9 Menú adjuntar -->
+  <div class="scene" id="s9">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch"><span class="back">←</span><div class="av" style="width:28px;height:28px;background:var(--blue);font-size:11px">MA</div><div class="chtitle" style="flex:1">Melchor</div></div>
+    <div class="body">
+      <div class="msgs">
+        <div class="mr"><div class="av" style="width:24px;height:24px;background:var(--blue);font-size:9px">MA</div><div class="bb"><div class="sndr">Melchor</div>¿Puedes adjuntar el contrato firmado?<div class="meta">10:00 ✓✓</div></div></div>
+      </div>
+      <div style="margin:0 12px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 -2px 12px rgba(0,0,0,.07)">
+        <div style="padding:8px 13px;font-size:10px;font-weight:800;color:#94a3b8;border-bottom:1px solid var(--border)">Adjuntar archivo</div>
+        <div class="ami"><span style="font-size:20px">📷</span><div><div style="font-size:13px;font-weight:800">Cámara</div><div style="font-size:10px;color:#94a3b8">Tomar foto ahora</div></div></div>
+        <div class="ami" style="background:#e0f2fe"><span style="font-size:20px">🖼</span><div><div style="font-size:13px;font-weight:800;color:#0369a1">Imagen</div><div style="font-size:10px;color:#0369a1">Elegir de la galería</div></div><span style="margin-left:auto;color:#0369a1;font-weight:800;font-size:11px">← seleccionado</span></div>
+        <div class="ami"><span style="font-size:20px">📄</span><div><div style="font-size:13px;font-weight:800">Documento</div><div style="font-size:10px;color:#94a3b8">PDF, Excel, Word…</div></div></div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">📎 Adjuntar — cámara, imagen o documento</div>
+  </div>
+
+  <!-- S10 Opciones mensaje + folio -->
+  <div class="scene" id="s10">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch"><span class="back">←</span><div class="av" style="width:28px;height:28px;background:#16a34a;font-size:11px">SC</div><div style="flex:1"><div class="chtitle">Saúl Nahúm Cruz</div><div style="font-size:9px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:3px"><span class="dot on" style="width:6px;height:6px"></span>En línea</div></div></div>
+    <div class="body">
+      <div class="msgs">
+        <div class="mr">
+          <div class="av" style="width:24px;height:24px;background:#16a34a;font-size:9px">SC</div>
+          <div class="bb">
+            <div class="sndr">Saúl Nahúm Cruz</div>
+            Relacionado con <span class="folio">🔗 #202523</span> — favor revisar accesos del módulo de reportes.
+            <div style="margin-top:6px;padding-top:5px;border-top:1px solid #e2e8f0;display:flex;gap:5px;flex-wrap:wrap">
+              <button style="border:1px solid var(--border);background:var(--soft);border-radius:7px;font-size:10px;padding:4px 8px;cursor:pointer;font-weight:800">↩ Responder</button>
+              <button style="border:1px solid var(--border);background:var(--soft);border-radius:7px;font-size:10px;padding:4px 8px;cursor:pointer">📋 Copiar</button>
+              <button style="border:1px solid var(--border);background:#e0f2fe;color:#0369a1;border-radius:7px;font-size:10px;padding:4px 8px;cursor:pointer;font-weight:800">🔗 Ver #202523</button>
+              <button style="border:1px solid var(--border);background:var(--soft);border-radius:7px;font-size:10px;padding:4px 8px;cursor:pointer">✓✓ Leídos</button>
+            </div>
+            <div class="meta">12:40 ✓✓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cb"><div class="abtn">📎</div><textarea class="ci" placeholder="Responder a Saúl…" rows="1"></textarea><div class="sbtn">➤</div></div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">🔗 Folio Ximpler — responder, copiar, ver tarjeta</div>
+  </div>
+
+  <!-- S11 Tarjeta Ximpler -->
+  <div class="scene" id="s11">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px">Haciendo</span></div></div>
+    <div class="ch"><span class="back">←</span><div class="chtitle">Tarjeta Ximpler #202523</div><span style="font-size:13px;color:#f59e0b">★</span></div>
+    <div class="body">
+      <div style="padding:10px 13px;border-bottom:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:800;color:#111;margin-bottom:9px">Crear un pendiente de ejemplo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:11px">
+          <div><div class="tc-lbl">Creada por</div><div style="display:flex;align-items:center;gap:3px"><div class="av" style="width:16px;height:16px;background:#7c3aed;font-size:5px">CE</div>Contador E.</div></div>
+          <div><div class="tc-lbl">Asignada a</div><div style="display:flex;align-items:center;gap:3px"><div class="av" style="width:16px;height:16px;background:var(--blue);font-size:5px">DP</div>Daniel Patiño</div></div>
+          <div><div class="tc-lbl">Estado</div>Haciendo</div>
+          <div><div class="tc-lbl">Creada</div>31 Mar 2026</div>
+        </div>
+      </div>
+      <div class="tc-tabs"><div class="tc-tab active">Comentarios</div><div class="tc-tab">Historial</div><div class="tc-tab">Tiempos</div></div>
+      <div style="padding:9px 12px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:7px"><div class="av" style="width:22px;height:22px;background:#475569;font-size:7px;flex:0 0 22px">IZ</div><div style="background:var(--soft);border-radius:9px;padding:7px 9px;font-size:11px;flex:1"><span style="font-weight:800">Ivan Zamoran</span> · hace 15 días<br>hey te encargo este pendiente urgente.. Favor de subir eivcendida</div></div>
+        <div style="display:flex;gap:7px"><div class="av" style="width:22px;height:22px;background:#475569;font-size:7px;flex:0 0 22px">IZ</div><div style="background:var(--soft);border-radius:9px;padding:7px 9px;font-size:11px;flex:1"><span style="font-weight:800">Ivan Zamoran</span><br>Ganadora</div></div>
+      </div>
+      <div style="padding:9px 12px;display:grid;grid-template-columns:1fr 1fr;gap:7px;border-top:1px solid var(--border)">
+        <div><div class="tc-sect">Recordatorios</div><div class="tc-val">Sin recordatorios</div></div>
+        <div><div class="tc-sect">Check List</div><div class="tc-val">Sin check list</div></div>
+        <div><div class="tc-sect">Archivos adjuntos</div><div class="tc-val">Sin archivos</div></div>
+        <div><div class="tc-sect">Etiquetas</div><div class="tc-val">Sin etiquetas</div></div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bni active"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">🔗 Tarjeta Ximpler — detalle del pendiente</div>
+  </div>
+
+  <!-- S12 Confirmación lectura -->
+  <div class="scene" id="s12">
+    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="ch"><span class="back">←</span><div class="chtitle">✓✓ Confirmación de lectura</div></div>
+    <div class="body">
+      <div style="padding:8px 13px;font-size:10px;color:#64748b;border-bottom:1px solid var(--border)">Enviado el 01 May 2026 · 11:10 — Equipo Administración</div>
+      <div class="rread"><div class="av" style="width:34px;height:34px;background:var(--blue);font-size:11px">MA</div><div style="flex:1"><div class="rread-name">Melchor Iván Angulo</div><div class="rread-sub">envió · 11:10</div></div><span class="pchip on">Visto</span></div>
+      <div class="rread"><div class="av" style="width:34px;height:34px;background:transparent;border:1.5px solid var(--border);color:#334155;font-size:11px">AC</div><div style="flex:1"><div class="rread-name">Anel Castro (tú)</div><div class="rread-sub">11:15</div></div><span class="pchip on">Visto</span></div>
+      <div class="rread"><div class="av" style="width:34px;height:34px;background:#f59e0b;font-size:11px">VH</div><div style="flex:1"><div class="rread-name">Victoria Hernández</div><div class="rread-sub">Pendiente</div></div><span class="pchip off">Pendiente</span></div>
+      <div class="rread"><div class="av" style="width:34px;height:34px;background:#7c3aed;font-size:11px">SA</div><div style="flex:1"><div class="rread-name">Salvador Ahumada</div><div class="rread-sub">Pendiente</div></div><span class="pchip off">Pendiente</span></div>
+      <div class="rread" style="border:0"><div class="av" style="width:34px;height:34px;background:#16a34a;font-size:11px">SC</div><div style="flex:1"><div class="rread-name">Saúl Nahúm Cruz</div><div class="rread-sub">11:40</div></div><span class="pchip on">Visto</span></div>
+    </div>
+    <div class="bnav">
+      <div class="bni"><span>💬</span><span>Chat</span></div>
+      <div class="bni active"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">✓✓ Confirmación de lectura por participante</div>
+  </div>
+
+  <!-- S13 Forum -->
+  <div class="scene" id="s13">
+    <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Forum General</span><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="body">
+      <div style="padding:10px 12px">
+        <div class="fp">
+          <div class="fp-hdr"><div class="av" style="width:26px;height:26px;background:var(--blue);font-size:9px">MA</div><div><div class="fp-name">Melchor Iván Angulo</div><div style="font-size:9px;color:#94a3b8">Dir. General</div></div><div class="fp-time">01 May · 10:10</div></div>
+          <div class="fp-body">Este espacio puede usarse para avisos generales, documentos y comunicación abierta para todo el equipo de Xfas.</div>
+          <div class="fp-reply">↩ Responder</div>
+        </div>
+        <div class="fp-thread">
+          <div class="fp">
+            <div class="fp-hdr"><div class="av" style="width:22px;height:22px;background:transparent;border:1.5px solid var(--border);color:#334155;font-size:8px">AC</div><div class="fp-name">Anel Castro (tú)</div><div class="fp-time">11:05</div></div>
+            <div class="fp-body">El Forum sirve como tablero general de discusión para toda la organización.</div>
+          </div>
+        </div>
+        <div class="fp">
+          <div class="fp-hdr"><div class="av" style="width:26px;height:26px;background:#f59e0b;font-size:9px">VH</div><div><div class="fp-name">Victoria Hernández</div><div style="font-size:9px;color:#94a3b8">Administración</div></div><div class="fp-time">14:30</div></div>
+          <div class="fp-body">Recuerden entregar sus reportes antes del viernes. <span class="folio">🔗 #ReporteMayo</span></div>
+          <div class="fp-reply">↩ Responder</div>
+        </div>
+      </div>
+    </div>
+    <div class="cb"><div class="abtn">📎</div><textarea class="ci" placeholder="Publica en el forum…" rows="1"></textarea><div class="sbtn">➤</div></div>
+    <div class="bnav">
+      <div class="bni"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni active"><span>⚙</span><span>Forum</span><div class="nbadge">1</div></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">⚙ Forum — avisos generales y discusión abierta</div>
+  </div>
+
+  <!-- S14 DOCS -->
+  <div class="scene" id="s14">
+    <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Docs</span><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="body">
+      <div style="padding:7px 10px;background:var(--soft);border-bottom:1px solid var(--border);display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <button style="border:1px solid var(--navy);background:var(--navy);color:#fff;padding:5px 11px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap">Todos</button>
+        <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:5px 11px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap">📄 Archivos</button>
+        <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:5px 11px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap">🖼 Imágenes</button>
+        <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:5px 11px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap">⬆ Enviados</button>
+        <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:5px 11px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap">⬇ Recibidos</button>
+      </div>
+      <div class="doc-row"><div class="doc-icon">📄</div><div class="doc-main"><div class="doc-name">Reporte_Q1_2026.pdf <span class="dpill sent">⬆ Enviado</span></div><div class="doc-meta">1.2 MB · Chat con Melchor · 01 May</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇ Descargar</button></div></div></div>
+      <div class="doc-row"><div class="doc-icon" style="background:#fce7f3">🖼</div><div class="doc-main"><div class="doc-name">captura_dashboard.png <span class="dpill img">🖼 Imagen</span></div><div class="doc-meta">340 KB · Chat con Melchor · Hoy</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇ Descargar</button></div></div></div>
+      <div class="doc-row"><div class="doc-icon">📄</div><div class="doc-main"><div class="doc-name">Contrato_Mantenimiento_2026.pdf <span class="dpill recv">⬇ Recibido</span></div><div class="doc-meta">890 KB · Teams / Sistemas · 28 Abr</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇ Descargar</button></div></div></div>
+      <div class="doc-row"><div class="doc-icon" style="background:#dcfce7">📊</div><div class="doc-main"><div class="doc-name">Presupuesto_Mayo2026.xlsx <span class="dpill recv">⬇ Recibido</span></div><div class="doc-meta">245 KB · Forum · Victoria · 30 Abr</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇ Descargar</button></div></div></div>
+    </div>
+    <div class="bnav">
+      <div class="bni"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni"><span>⚙</span><span>Forum</span></div>
+      <div class="bni active"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">📁 DOCS — repositorio centralizado de archivos</div>
+  </div>
+
+  <!-- S15 Forum enviar -->
+  <div class="scene" id="s15">
+    <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Forum General</span><div class="tbr"><div class="av" style="width:26px;height:26px;background:var(--blue)">AC</div></div></div>
+    <div class="body">
+      <div style="padding:10px 12px">
+        <div class="fp">
+          <div class="fp-hdr"><div class="av" style="width:26px;height:26px;background:var(--blue);font-size:9px">MA</div><div class="fp-name">Melchor</div><div class="fp-time">10:10</div></div>
+          <div class="fp-body">Avisos generales y comunicación abierta para todo Xfas.</div>
+        </div>
+        <div class="mr me" style="padding:0 2px;margin-bottom:7px">
+          <div class="bb me">
+            📣 Recuerden: junta de cierre de mayo este viernes 30 a las 10am. Confirmen asistencia. <span class="folio">🔗 #CierreMayo</span>
+            <div class="meta">Ahora ✓</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center"><span style="background:#dcfce7;color:#15803d;font-size:10px;padding:3px 14px;border-radius:999px;font-weight:800">📣 Publicado — toda la empresa lo verá</span></div>
+      </div>
+    </div>
+    <div class="cb"><div class="abtn">📎</div><textarea class="ci" placeholder="Publica en el forum…" rows="1"></textarea><div class="sbtn">➤</div></div>
+    <div class="bnav">
+      <div class="bni"><span>💬</span><span>Chat</span></div>
+      <div class="bni"><span>👥</span><span>Teams</span></div>
+      <div class="bni active"><span>⚙</span><span>Forum</span></div>
+      <div class="bni"><span>📁</span><span>Docs</span></div>
+    </div>
+    <div class="lbl">📣 Aviso comunitario enviado al Forum de Xfas</div>
+  </div>
+
+</div><!-- /wrap -->
+
+<div id="ctrls">
+  <button class="cbtn" onclick="chg(-1)">◀</button>
+  <button class="cbtn" id="pbtn" onclick="tog()">⏸</button>
+  <button class="cbtn" onclick="chg(1)">▶</button>
+</div>
+
+<script>
+const TOTAL=16;
+const DUR=[4000,3500,3500,3500,3000,3500,3500,3500,3500,3500,3500,3500,3500,3500,4000,3500];
+
+// cursor coords relative to #wrap (percentage-based → recalc on show)
+// [fx%,fy%, tx%,ty%, cx%,cy% or null] — percentages of wrap width/height
+const CRS=[
+  null,
+  {fx:.5,fy:.4,tx:.5,ty:.4,cx:null},
+  {fx:.5,fy:.35,tx:.5,ty:.35,cx:.5,cy:.35},
+  {fx:.87,fy:.82,tx:.87,ty:.82,cx:null},
+  {fx:.9,fy:.84,tx:.9,ty:.84,cx:.9,cy:.84},
+  {fx:.9,fy:.13,tx:.9,ty:.13,cx:.9,cy:.13},
+  {fx:.25,fy:.93,tx:.25,ty:.93,cx:.25,cy:.93},
+  {fx:.5,fy:.45,tx:.5,ty:.45,cx:.5,cy:.45},
+  {fx:.5,fy:.65,tx:.15,ty:.85,cx:.15,cy:.85},
+  {fx:.15,fy:.85,tx:.15,ty:.85,cx:.15,cy:.85},
+  {fx:.65,fy:.55,tx:.72,ty:.6,cx:.72,cy:.6},
+  {fx:.72,fy:.6,tx:.72,ty:.6,cx:null},
+  {fx:.5,fy:.5,tx:.5,ty:.5,cx:null},
+  {fx:.25,fy:.93,tx:.25,ty:.93,cx:.25,cy:.93},
+  {fx:.75,fy:.93,tx:.75,ty:.93,cx:.75,cy:.93},
+  {fx:.75,fy:.83,tx:.9,ty:.85,cx:.9,cy:.85},
+];
+
+let cur=0,playing=true,elapsed=0,lastTs=null,raf=null;
+
+function getWrapRect(){return document.getElementById('wrap').getBoundingClientRect();}
+
+function showScene(i){
+  document.querySelectorAll('.scene').forEach((s,j)=>s.classList.toggle('active',j===i));
+  document.getElementById('scnt').textContent=(i+1)+'/'+TOTAL;
+  document.getElementById('pgbar').style.width='0%';
+  elapsed=0;
+  animCursor(i);
+}
+
+function animCursor(idx){
+  const c=document.getElementById('cur');
+  const r=document.getElementById('cring');
+  const info=CRS[idx];
+  if(!info){c.style.opacity='0';return;}
+  const rect=getWrapRect();
+  const W=rect.width,H=rect.height;
+  c.style.opacity='1';
+  c.style.left=(info.fx*W)+'px'; c.style.top=(info.fy*H)+'px';
+  const hasMov=info.tx!==info.fx||info.ty!==info.fy;
+  if(hasMov) setTimeout(()=>{c.style.left=(info.tx*W)+'px';c.style.top=(info.ty*H)+'px';},420);
+  if(info.cx!=null){
+    const delay=hasMov?980:480;
+    setTimeout(()=>{
+      r.style.left=(info.cx*W)+'px'; r.style.top=(info.cy*H)+'px';
+      r.className='pop'; setTimeout(()=>{r.className='';},600);
+    },delay);
+  }
+}
+
+function chg(d){
+  cur=(cur+d+TOTAL)%TOTAL;showScene(cur);elapsed=0;lastTs=null;
+  if(playing){cancelAnimationFrame(raf);requestAnimationFrame(loop);}
+}
+function tog(){
+  playing=!playing;document.getElementById('pbtn').textContent=playing?'⏸':'▶';
+  if(playing){lastTs=null;requestAnimationFrame(loop);}else cancelAnimationFrame(raf);
+}
+function loop(ts){
+  if(!playing)return;if(!lastTs)lastTs=ts;
+  const dt=ts-lastTs;lastTs=ts;elapsed+=dt;
+  const d=DUR[cur];
+  document.getElementById('pgbar').style.width=Math.min(elapsed/d*100,100)+'%';
+  if(elapsed>=d){cur=(cur+1)%TOTAL;showScene(cur);lastTs=null;}
+  raf=requestAnimationFrame(loop);
+}
+const s=document.createElement('style');
+s.textContent='#cring.pop{animation:xr .5s ease-out forwards}@keyframes xr{0%{opacity:.9;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.9)}}';
+document.head.appendChild(s);
+showScene(0);requestAnimationFrame(loop);
+</script>
+</body>
+</html>

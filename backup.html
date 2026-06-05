@@ -1,4 +1,3 @@
-df
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -33,7 +32,7 @@ html,body{
 
 /* ── scenes ── */
 .scene{
-  position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  position:absolute;inset:0;opacity:0;transition:opacity .5s;
   display:flex;flex-direction:column;
 }
 .scene.active{opacity:1;z-index:2}
@@ -208,7 +207,7 @@ html,body{
 
 /* ── cursor ── */
 #cur{position:absolute;pointer-events:none;z-index:40;
-  transition:top .48s cubic-bezier(.4,0,.2,1),left .48s cubic-bezier(.4,0,.2,1),opacity .3s}
+  transition:top .48s cubic-bezier(.4,0,.2,1),left .48s cubic-bezier(.4,0,.2,1),opacity .5s}
 #cur svg{width:20px;height:20px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.55))}
 #cring{position:absolute;width:30px;height:30px;border:2.5px solid rgba(255,255,255,.9);
   border-radius:50%;pointer-events:none;z-index:39;opacity:0;transform:translate(-50%,-50%) scale(0)}
@@ -242,9 +241,9 @@ html,body{
   <!-- S0 INTRO -->
   <div class="scene active" id="s0">
     <div class="intro">
-      <div class="i-eyebrow">Este Verano 2026</div>
+      <div class="i-title">Este Verano 2026</div>
       <div class="i-title">Llega el Centro de<br>Comunicación <span>Xfas</span></div>
-      <div class="i-sub">por Ximpler.App — Team Chat v1.6</div>
+      <div class="i-sub">por Ximpler.App — Team Chat Vx1</div>
       <div class="i-pills">
         <div class="ipill">💬 Chat</div>
         <div class="ipill">👥 Teams</div>

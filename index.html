@@ -201,7 +201,7 @@ html,body{
 }
 
 /* ── progress + counter ── */
-#pgbar{position:absolute;bottom:0;left:0;height:3px;background:var(--blue);border-radius:0 999px 999px 0;z-index:30;transition:width .2s linear}
+#pgbar{position:absolute;bottom:0;left:0;height:3px;background:var(--blue);border-radius:0 999px 999px 0;z-index:30;transition:width .3s linear}
 #scnt{position:absolute;top:6px;right:10px;font-size:9px;color:rgba(255,255,255,.4);z-index:50;pointer-events:none}
 
 /* ── controls ── */
@@ -557,43 +557,6 @@ html,body{
     <div class="lbl">🔗 Folio Ximpler — responder, copiar, ver tarjeta</div>
   </div>
 
-  <!-- S11 Tarjeta Ximpler -->
-  <div class="scene" id="s11">
-    <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><span style="background:#dbeafe;color:#1d4ed8;font-size:clamp(7px,1.5vw,9px);font-weight:800;padding:2px 6px;border-radius:999px">Haciendo</span></div></div>
-    <div class="pb">
-      <div class="rail">
-        <div class="rt active"><span>💬</span><span>Chat</span></div>
-        <div class="rt"><span>👥</span><span>Teams</span></div>
-        <div class="rt"><span>⚙</span><span>Forum</span></div>
-        <div class="rt"><span>📁</span><span>Docs</span></div>
-      </div>
-      <div class="ca">
-        <div class="ch"><span style="font-size:14px;cursor:pointer;opacity:.8">←</span><span style="flex:1">Tarjeta #202523</span><span style="font-size:11px;color:#f59e0b">★</span></div>
-        <div style="flex:1;overflow-y:auto;background:#fff">
-          <div style="padding:8px 10px;border-bottom:1px solid var(--border)">
-            <div style="font-size:clamp(10px,2.2vw,13px);font-weight:800;color:#111;margin-bottom:7px">Crear un pendiente de ejemplo</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:clamp(8px,1.7vw,11px)">
-              <div><div class="tclbl">Creada por</div><div style="display:flex;align-items:center;gap:3px"><div class="av" style="width:14px;height:14px;background:#7c3aed;font-size:5px">CE</div>Contador E.</div></div>
-              <div><div class="tclbl">Asignada a</div><div style="display:flex;align-items:center;gap:3px"><div class="av" style="width:14px;height:14px;background:var(--blue);font-size:5px">DP</div>Daniel Patiño</div></div>
-            </div>
-          </div>
-          <div class="tctabs"><div class="tctab active">Comentarios</div><div class="tctab">Historial</div><div class="tctab">Tiempos</div></div>
-          <div style="padding:7px 9px;display:flex;flex-direction:column;gap:5px">
-            <div style="display:flex;gap:5px"><div class="av" style="width:18px;height:18px;background:#475569;font-size:6px;flex:0 0 18px">IZ</div><div style="background:var(--soft);border-radius:6px;padding:5px 7px;font-size:clamp(8px,1.7vw,10px);flex:1"><span style="font-weight:800">Ivan Zamoran</span> · hace 15 días<br>hey te encargo este pendiente urgente..</div></div>
-            <div style="display:flex;gap:5px"><div class="av" style="width:18px;height:18px;background:#475569;font-size:6px;flex:0 0 18px">IZ</div><div style="background:var(--soft);border-radius:6px;padding:5px 7px;font-size:clamp(8px,1.7vw,10px);flex:1"><span style="font-weight:800">Ivan Zamoran</span><br>Ganadora</div></div>
-          </div>
-          <div style="padding:7px 9px;display:grid;grid-template-columns:1fr 1fr;gap:6px;border-top:1px solid var(--border)">
-            <div><div class="tcsect">Recordatorios</div><div class="tcval">Sin recordatorios</div></div>
-            <div><div class="tcsect">Check List</div><div class="tcval">Sin check list</div></div>
-            <div><div class="tcsect">Archivos adjuntos</div><div class="tcval">Sin archivos</div></div>
-            <div><div class="tcsect">Etiquetas</div><div class="tcval">Sin etiquetas</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="lbl">🔗 Tarjeta Ximpler — detalle del pendiente</div>
-  </div>
-
   <!-- S12 Confirmación lectura -->
   <div class="scene" id="s12">
     <div class="tb"><div class="logo">Ximpler</div><div class="tbr"><div class="av" style="width:22px;height:22px;background:var(--blue);font-size:9px">AC</div></div></div>
@@ -655,37 +618,7 @@ html,body{
     <div class="lbl">⚙ Forum — avisos generales y discusión abierta</div>
   </div>
 
-  <!-- S14 DOCS -->
-  <div class="scene" id="s14">
-    <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Docs</span><div class="tbr"><div class="av" style="width:22px;height:22px;background:var(--blue);font-size:9px">AC</div></div></div>
-    <div class="pb">
-      <div class="rail">
-        <div class="rt"><span>💬</span><span>Chat</span></div>
-        <div class="rt"><span>👥</span><span>Teams</span></div>
-        <div class="rt"><span>⚙</span><span>Forum</span></div>
-        <div class="rt active"><span>📁</span><span>Docs</span></div>
-      </div>
-      <div class="ca">
-        <div class="ch">📁 Repositorio Documental</div>
-        <div style="padding:5px 7px;background:var(--soft);border-bottom:1px solid var(--border);display:flex;gap:4px;overflow-x:auto;flex:0 0 auto">
-          <button style="border:1px solid var(--navy);background:var(--navy);color:#fff;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">Todos</button>
-          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">📄 Archivos</button>
-          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">🖼 Imágenes</button>
-          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">⬆ Enviados</button>
-          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">⬇ Recibidos</button>
-        </div>
-        <div style="flex:1;overflow-y:auto;background:#fff">
-          <div class="doc-row"><div class="doc-icon">📄</div><div class="doc-main"><div class="doc-name">Reporte_Q1_2026.pdf<span class="dpill sent">⬆ Enviado</span></div><div class="doc-meta">1.2 MB · Chat Melchor · 01 May</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
-          <div class="doc-row"><div class="doc-icon" style="background:#fce7f3">🖼</div><div class="doc-main"><div class="doc-name">captura_dashboard.png<span class="dpill img">🖼</span></div><div class="doc-meta">340 KB · Chat Melchor · Hoy</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
-          <div class="doc-row"><div class="doc-icon">📄</div><div class="doc-main"><div class="doc-name">Contrato_Mantenimiento.pdf<span class="dpill recv">⬇ Recibido</span></div><div class="doc-meta">890 KB · Teams Sistemas · 28 Abr</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
-          <div class="doc-row"><div class="doc-icon" style="background:#dcfce7">📊</div><div class="doc-main"><div class="doc-name">Presupuesto_Mayo2026.xlsx<span class="dpill recv">⬇ Recibido</span></div><div class="doc-meta">245 KB · Forum Victoria · 30 Abr</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
-        </div>
-      </div>
-    </div>
-    <div class="lbl">📁 DOCS — repositorio centralizado de archivos</div>
-  </div>
-
-  <!-- S15 Forum enviar -->
+   <!-- S15 Forum enviar -->
   <div class="scene" id="s15">
     <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Forum</span><div class="tbr"><div class="av" style="width:22px;height:22px;background:var(--blue);font-size:9px">AC</div></div></div>
     <div class="pb">
@@ -716,6 +649,36 @@ html,body{
     <div class="lbl">📣 Aviso comunitario enviado al Forum de Xfas</div>
   </div>
 
+  <!-- S14 DOCS -->
+  <div class="scene" id="s14">
+    <div class="tb"><div class="logo">Ximpler</div><span style="color:#cbd5e1;font-size:11px;font-weight:800">Docs</span><div class="tbr"><div class="av" style="width:22px;height:22px;background:var(--blue);font-size:9px">AC</div></div></div>
+    <div class="pb">
+      <div class="rail">
+        <div class="rt"><span>💬</span><span>Chat</span></div>
+        <div class="rt"><span>👥</span><span>Teams</span></div>
+        <div class="rt"><span>⚙</span><span>Forum</span></div>
+        <div class="rt active"><span>📁</span><span>Docs</span></div>
+      </div>
+      <div class="ca">
+        <div class="ch">📁 Repositorio Documental</div>
+        <div style="padding:5px 7px;background:var(--soft);border-bottom:1px solid var(--border);display:flex;gap:4px;overflow-x:auto;flex:0 0 auto">
+          <button style="border:1px solid var(--navy);background:var(--navy);color:#fff;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">Todos</button>
+          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">📄 Archivos</button>
+          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">🖼 Imágenes</button>
+          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">⬆ Enviados</button>
+          <button style="border:1px solid var(--border);background:#fff;color:#334155;padding:3px 8px;border-radius:999px;font-size:clamp(7px,1.5vw,9px);font-weight:800;white-space:nowrap">⬇ Recibidos</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;background:#fff">
+          <div class="doc-row"><div class="doc-icon">📄</div><div class="doc-main"><div class="doc-name">Reporte_Q1_2026.pdf<span class="dpill sent">⬆ Enviado</span></div><div class="doc-meta">1.2 MB · Chat Melchor · 01 May</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
+          <div class="doc-row"><div class="doc-icon" style="background:#fce7f3">🖼</div><div class="doc-main"><div class="doc-name">captura_dashboard.png<span class="dpill img">🖼</span></div><div class="doc-meta">340 KB · Chat Melchor · Hoy</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
+          <div class="doc-row"><div class="doc-icon">📄</div><div class="doc-main"><div class="doc-name">Contrato_Mantenimiento.pdf<span class="dpill recv">⬇ Recibido</span></div><div class="doc-meta">890 KB · Teams Sistemas · 28 Abr</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
+          <div class="doc-row"><div class="doc-icon" style="background:#dcfce7">📊</div><div class="doc-main"><div class="doc-name">Presupuesto_Mayo2026.xlsx<span class="dpill recv">⬇ Recibido</span></div><div class="doc-meta">245 KB · Forum Victoria · 30 Abr</div><div class="doc-act"><button class="dmini">💬 Ver mensaje</button><button class="ddl">⬇</button></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="lbl">📁 DOCS — repositorio centralizado de archivos</div>
+  </div>
+
 </div><!-- /wrap -->
 
 <div id="ctrls">
@@ -725,8 +688,8 @@ html,body{
 </div>
 
 <script>
-const TOTAL=16;
-const DUR=[4000,3500,3500,3500,3000,3500,3500,3500,3500,3500,3500,3500,3500,3500,4000,3500];
+const TOTAL=15;
+const DUR=[4000,3500,3500,3500,3000,3500,3500,3500,3500,3500,3500,3500,3500,3500,4000];
 // cursor as % of wrap [fx,fy,tx,ty,cx,cy]
 const CRS=[
   null,
